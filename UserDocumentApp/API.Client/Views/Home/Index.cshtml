@@ -1,0 +1,60 @@
+﻿@model List<API.Core.Models.UserDocumentViewModel>
+@{
+    ViewData["Title"] = "User Documents";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>@ViewBag.StatusCode</h3>
+<br/>
+<h2>Add Document</h2>
+<form asp-action="Add" method="post">
+    <div class="form-group">
+        <label for="Document">Select Document:</label>
+        <input type="file" name="DocumentName" accept="application/pdf" />
+    </div>
+    <div class="form-group">
+        <label for="Username">User name:</label>
+        <input class="form-control" name="UserName" />
+    </div>
+    <div class="text-center panel-body">
+        <button type="submit" class="btn btn-sm btn-primary">Upload</button>
+    </div>
+</form>
+
+<br/>
+<br />
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name of User</th>
+                <th>Name of Document</th>
+                <th>Uploaded At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.</td>
+                        <td>@item.DocumentName</td>
+                        <td>@item.DocumentUploadedDateTime.ToString("dd-MM-yyyy")</td>
+                        <td>
+                            <a class="btn btn-primary" href="@item.DocumentPath" alt="No Document found" target="_blank">View</a>
+                            <a class="btn btn-danger" asp-action="Delete" asp-route-documentId="@item.DocumentID" method="delete">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4">No Records found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

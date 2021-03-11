@@ -1,0 +1,11 @@
+READ ME :
+------------------
+
+1. Execute the DB script i.e. DBScript.sql 
+
+2. Follow the steps as below:
+	1) Run API project
+	2) Run Web application i.e. API.Client
+	3) Enter User name and Upload pdf file > Click "Upload" button
+	4) Uploaded data will be displayed in the same screen under Grid section
+	5) Perform View or Delete action
