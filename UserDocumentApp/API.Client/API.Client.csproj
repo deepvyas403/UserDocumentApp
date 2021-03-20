@@ -20,10 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\twitter-bootstrap\css\bootstrap-grid.css" />
     <None Include="wwwroot\twitter-bootstrap\css\bootstrap-grid.css.map" />
     <None Include="wwwroot\twitter-bootstrap\css\bootstrap-grid.min.css" />

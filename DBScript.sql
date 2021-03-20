@@ -1,3 +1,6 @@
+CREATE DATABASE [UserDocumentDB];
+GO
+
 USE [UserDocumentDB]
 GO
 

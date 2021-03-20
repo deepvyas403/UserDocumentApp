@@ -20,16 +20,21 @@ namespace API.Data.Repository
         }
 
         /// <summary>
-        /// 
+        /// Created By : Deep Vyas | 11-Mar-2021
+        /// Description : To add user documents
         /// </summary>
-        /// <param name="userDocumentReq"></param>
-        /// <returns></returns>
         public async Task<int> Add(UserDocumentRequest userDocumentReq)
         {
             int result = 0;
-            User user = new User() { Name = userDocumentReq.UserName };
-            await _dbContext.Users.AddAsync(user);
-            await _dbContext.SaveChangesAsync();
+
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == userDocumentReq.UserName);
+
+            if (user == null)
+            {
+                user = new User() { Name = userDocumentReq.UserName };
+                await _dbContext.Users.AddAsync(user);
+                await _dbContext.SaveChangesAsync();
+            }
 
             if (user.UserId > 0)
             {
@@ -47,6 +52,10 @@ namespace API.Data.Repository
             return result;
         }
 
+        /// <summary>
+        /// Created By : Deep Vyas | 11-Mar-2021
+        /// Description : To delete user document
+        /// </summary>
         public async Task<int> Delete(int documentID)
         {
             int result = 0;
@@ -62,6 +71,10 @@ namespace API.Data.Repository
             return result;
         }
 
+        /// <summary>
+        /// Created By : Deep Vyas | 11-Mar-2021
+        /// Description : To get all user documents
+        /// </summary>
         public async Task<IList<UserDocumentViewModel>> GetAll()
         {
             return await (from user in _dbContext.Users
@@ -69,7 +82,7 @@ namespace API.Data.Repository
                           where doc.IsActive == true
                           select new UserDocumentViewModel
                           {
-                              DocumentID = doc.DocumentId,
+                              DocumentId = doc.DocumentId,
                               DocumentName = doc.FileName,
                               DocumentPath = doc.Path,
                               UserName = user.Name,

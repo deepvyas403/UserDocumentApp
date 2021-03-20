@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using API.Core.Models;
 using System.IO;
-using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Hosting;
+using System.Text;
+using API.Core.Constants;
+using System.Linq;
 
 namespace API.Controllers
 {
@@ -16,9 +17,12 @@ namespace API.Controllers
     public class UserDocumentController : ControllerBase
     {
         readonly IUserDocumentRepository _userDocumentRepository;
-        public UserDocumentController(IUserDocumentRepository userDocumentRepository)
+        readonly IWebHostEnvironment _hostingEnvironment;
+
+        public UserDocumentController(IUserDocumentRepository userDocumentRepository, IWebHostEnvironment hostingEnvironment)
         {
             _userDocumentRepository = userDocumentRepository;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -35,6 +39,12 @@ namespace API.Controllers
                 {
                     return NotFound();
                 }
+
+                foreach (var document in userDocuments)
+                {
+                    document.DocumentPath = $"{Request.Scheme}://{Request.Host.Value}/{document.DocumentPath}";
+                }
+
                 return Ok(userDocuments);
             }
             catch (Exception ex)
@@ -48,31 +58,40 @@ namespace API.Controllers
         /// Description : To add user documents
         /// </summary>
         [HttpPost, DisableRequestSizeLimit]
-        public async Task<IActionResult> AddUserDocument(UserDocumentRequest userDocumentRequest)
+        public async Task<IActionResult> AddUserDocument([FromForm] UserDocumentRequest userDocumentRequest)
         {
             try
             {
-                var formCollection = await Request.ReadFormAsync();
-                var file = formCollection.Files.First();
-                var folderName = "DocBank";
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                if (file.Length > 0)
+                string extension = Path.GetExtension(userDocumentRequest.Document.FileName);
+
+                if (extension != Constants.ALLOWED_EXTENSION)
                 {
-                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                    var fullPath = Path.Combine(pathToSave, fileName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                    {
-                        file.CopyTo(stream);
-                    }
-                    userDocumentRequest.DocumentPath = fullPath;
+                    return BadRequest(new { ErrorMessage = ErrorMessages.ONLY_PDF_EXTENSION_ALLOWED });
                 }
+
+                userDocumentRequest.DocumentName = $"{Guid.NewGuid()}{extension}";
+
+                string directory = Path.Combine(_hostingEnvironment.WebRootPath, Constants.DOCUMENT_PATH);
+                string path = Path.Combine(directory, userDocumentRequest.DocumentName);
+
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                using (Stream stream = new FileStream(path, FileMode.Create))
+                {
+                    userDocumentRequest.Document.CopyTo(stream);
+                }
+
+                userDocumentRequest.DocumentPath = Path.Combine(Constants.DOCUMENT_PATH, userDocumentRequest.DocumentName);
 
                 int result = await _userDocumentRepository.Add(userDocumentRequest);
                 if (result == 0)
                 {
                     return NotFound();
                 }
-                return Ok();
+                return StatusCode(StatusCodes.Status201Created);
             }
             catch (Exception ex)
             {
@@ -84,13 +103,13 @@ namespace API.Controllers
         /// Created By : Deep Vyas | 11-Mar-2021
         /// Description : To delete user document
         /// </summary>
-        [Route("{documentID}")]
+        [Route("{documentId}")]
         [HttpDelete]
-        public async Task<IActionResult> DeleteUserDocument(int documentID)
+        public async Task<IActionResult> DeleteUserDocument(int documentId)
         {
             try
             {
-                int result = await _userDocumentRepository.Delete(documentID);
+                int result = await _userDocumentRepository.Delete(documentId);
                 if (result == 0)
                 {
                     return NotFound();

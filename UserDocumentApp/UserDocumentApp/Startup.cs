@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,13 +39,25 @@ namespace UserDocumentApp
                                  (Configuration.GetConnectionString("UserDocumentDBConnection")));
             services.AddScoped<IUserDocumentRepository, UserDocumentRepository>();
 
-            services.Configure<FormOptions>(o => {
+            services.Configure<FormOptions>(o =>
+            {
                 o.ValueLengthLimit = int.MaxValue;
                 o.MultipartBodyLengthLimit = int.MaxValue;
                 o.MemoryBufferThreshold = int.MaxValue;
             });
 
-            
+            services.AddCors(options =>
+            {
+                options.AddPolicy("Policy1", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                    .WithMethods("POST", "GET", "PUT", "DELETE")
+                    .WithHeaders(HeaderNames.ContentType);
+                });
+            });
+
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,13 +68,11 @@ namespace UserDocumentApp
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("Policy1");
+
             app.UseHttpsRedirection();
-            
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"DocBank")),
-                RequestPath = new PathString("/DocBank")
-            });
+
+            app.UseStaticFiles();
 
             app.UseRouting();
 

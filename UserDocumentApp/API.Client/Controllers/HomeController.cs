@@ -1,10 +1,13 @@
-﻿using API.Core.Models;
+﻿using API.Core.Constants;
+using API.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,28 +59,39 @@ namespace API.Client.Controllers
         /// Description : To save User Document details
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Add(UserDocumentRequest userDocument)
+        public async Task<IActionResult> Index(UserDocumentRequest userDocument)
         {
-            using (var httpClient = new HttpClient())
+            if (userDocument.Document == null)
             {
-                StringContent content = new StringContent(JsonConvert.SerializeObject(userDocument), Encoding.UTF8, "application/json");
-
-                using (var response = await httpClient.PostAsync(apiBaseUrl, content))
-                {
-                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                    {
-                        ViewBag.StatusCode = response.StatusCode;
-                    }
-                }
+                ViewBag.Error = ErrorMessages.DOCUMENT_REQUIRED;
+                return View("Index");
             }
-            return RedirectToAction("Index");
+
+            using (var memoryStream = new MemoryStream())
+            {
+                //Get the file steam from the multiform data uploaded from the browser
+                await userDocument.Document.CopyToAsync(memoryStream);
+
+                //Build an multipart/form-data request to upload the file to Web API
+                using var form = new MultipartFormDataContent();
+                using var fileContent = new ByteArrayContent(memoryStream.ToArray());
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
+                form.Add(fileContent, "Document", userDocument.Document.FileName);
+                var userName = new StringContent(userDocument.UserName);
+                form.Add(userName, "UserName");
+
+                var client = new HttpClient();
+                var response = await client.PostAsync(apiBaseUrl, form);
+                response.EnsureSuccessStatusCode();
+                var result = await response.Content.ReadAsStringAsync();
+                return RedirectToAction("Index");
+            }
         }
 
         /// <summary>
         /// Created By : Deep Vyas | 11-Mar-2021
         /// Description : To delete document (Soft Delete)
         /// </summary>
-        [HttpDelete]
         public async Task<IActionResult> Delete(int documentId)
         {
             using (var httpClient = new HttpClient())

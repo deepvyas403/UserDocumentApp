@@ -3,6 +3,19 @@
 ################################################################################
 
 *.suo
-*.sqlite
-**/bin/*
-**/obj/*
+*.user
+_ReSharper.*
+bin
+obj
+packages
+.vs
+UserDocumentApp/API.Client/bin
+/UserDocumentApp/.vs
+/UserDocumentApp/API.Client/obj
+/UserDocumentApp/API.Client/bin
+/UserDocumentApp/API.Core/obj
+/UserDocumentApp/API.Core/bin
+/UserDocumentApp/API.Data/obj
+/UserDocumentApp/API.Data/bin
+/UserDocumentApp/UserDocumentApp/obj
+/UserDocumentApp/UserDocumentApp/bin

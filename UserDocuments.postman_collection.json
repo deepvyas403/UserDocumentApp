@@ -1,0 +1,124 @@
+{
+	"info": {
+		"_postman_id": "2c9d8172-b243-472f-9768-001621ddc95a",
+		"name": "UserDocuments",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Documents",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:30449/api/UserDocument",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30449",
+					"path": [
+						"api",
+						"UserDocument"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Document",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "Document",
+							"type": "file",
+							"src": "/C:/Users/HARSH SOLANKI/Downloads/Get_Started_With_Smallpdf.pdf"
+						},
+						{
+							"key": "userName",
+							"value": "deep@gmail.com",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:30449/api/UserDocument",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30449",
+					"path": [
+						"api",
+						"UserDocument"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Document",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:30449/api/UserDocument/MQ==",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30449",
+					"path": [
+						"api",
+						"UserDocument",
+						"MQ=="
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

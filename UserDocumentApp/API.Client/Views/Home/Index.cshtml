@@ -1,27 +1,34 @@
 ﻿@model List<API.Core.Models.UserDocumentViewModel>
-@{
-    ViewData["Title"] = "User Documents";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ ViewData["Title"] = "User Documents";
+    Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <h3>@ViewBag.StatusCode</h3>
-<br/>
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+<br />
 <h2>Add Document</h2>
-<form asp-action="Add" method="post">
-    <div class="form-group">
-        <label for="Document">Select Document:</label>
-        <input type="file" name="DocumentName" accept="application/pdf" />
-    </div>
-    <div class="form-group">
-        <label for="Username">User name:</label>
-        <input class="form-control" name="UserName" />
-    </div>
-    <div class="text-center panel-body">
-        <button type="submit" class="btn btn-sm btn-primary">Upload</button>
-    </div>
-</form>
+<br />
+<div class="panel panel-default">
+    <form asp-action="Index" asp-controller="Home" method="post" enctype="multipart/form-data">
+        <div class="panel-body">
+            <div class="row form-group">
+                <label class="col-md-2" for="Document">Select Document:</label>
+                <input type="file" name="Document" accept="application/pdf" />
+            </div>
+            <div class="row form-group">
+                <label class="col-md-2" for="Username">User name:</label>
+                <input class="form-control col-md-4" name="UserName" maxlength="200" required />
+            </div>
+        </div>
+        <div class="panel-footer" style="margin-left:16%;">
+            <button type="submit" class="btn btn-sm btn-primary">Upload</button>
+        </div>
+    </form>
+</div>
 
-<br/>
+<br />
 <br />
 <div class="container">
     <table class="table table-striped">
@@ -38,23 +45,23 @@
             {
                 @foreach (var item in Model)
                 {
-                    <tr>
-                        <td>@item.</td>
-                        <td>@item.DocumentName</td>
-                        <td>@item.DocumentUploadedDateTime.ToString("dd-MM-yyyy")</td>
-                        <td>
-                            <a class="btn btn-primary" href="@item.DocumentPath" alt="No Document found" target="_blank">View</a>
-                            <a class="btn btn-danger" asp-action="Delete" asp-route-documentId="@item.DocumentID" method="delete">Delete</a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>@item.UserName</td>
+                    <td>@item.DocumentName</td>
+                    <td>@item.DocumentUploadedDateTime.ToString("dd-MM-yyyy")</td>
+                    <td>
+                        <a class="btn btn-primary" href="@item.DocumentPath" alt="No Document found" target="_blank">View</a>
+                        <a class="btn btn-danger" href="@Url.Action("Delete","Home", new { documentId = item.DocumentId })" method="delete">Delete</a>
+                    </td>
+                </tr>
                 }
             }
-            else
-            {
-                <tr>
-                    <td colspan="4">No Records found.</td>
-                </tr>
-            }
+        else
+         {
+            <tr>
+                <td colspan="4">No Records found.</td>
+            </tr>
+        }
         </tbody>
     </table>
 </div>
